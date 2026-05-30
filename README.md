@@ -2,7 +2,7 @@
 
 A focused Codex Skill for upgrading existing SwiftUI macOS apps with a polished, native, glass-style interface.
 
-The skill helps Codex inspect an app, create or extend a small reusable design system, apply translucent panels/cards/buttons/navigation consistently, support accessibility fallbacks, build the project, and report exactly what changed.
+The skill helps Codex inspect an app, create or extend a small reusable design system, apply translucent panels/cards/buttons/navigation consistently, support accessibility fallbacks, build the project, and report exactly what changed. It is opinionated about restraint: the goal is a native macOS glass UI, not blur applied everywhere.
 
 ## What This Is
 
@@ -14,26 +14,33 @@ This repository publishes one Codex Skill:
 
 It is an instruction bundle, not a Swift package or drop-in UI library. Codex adapts the guidance to the target app's structure.
 
-## Safety Promise
+## Who This Is For
 
-The skill is intentionally UI-only. It tells Codex to preserve business logic and avoid changes to models, stores, services, networking, persistence, authentication, payments, analytics, routing behavior, feature calculations, entitlements, signing, dependencies, and deployment targets.
+Use this if you are a developer with an existing SwiftUI macOS app and you want Codex to perform a focused visual-system pass: app shell, navigation, cards, panels, buttons, settings, onboarding, menu-bar popovers, light/dark mode, and Reduce Transparency support.
 
-Use it for SwiftUI macOS visual work such as:
+This is not for new product features, backend work, generic web glassmorphism, or non-SwiftUI apps.
 
-- reusable glass panels, cards, buttons, navigation items, sheets, and modifiers
-- dashboard, settings, onboarding, menu-bar popover, or app-shell polish
-- light mode, dark mode, Reduce Transparency, contrast, hover, focus, and selected-state improvements
-- refactoring duplicated visual styling into a smaller design system
+## What Codex Should Change
 
-Do not use it for backend work, payment flows, authentication, database logic, feature behavior, generic web design, or non-SwiftUI projects.
+Codex should limit changes to presentation-layer SwiftUI code:
+
+- SwiftUI views, modifiers, button styles, navigation styles, sheets, cards, panels, and visual tokens
+- small reusable design-system files such as `GlassTheme.swift`, `GlassPanel.swift`, `GlassButton.swift`, or `GlassModifiers.swift`
+- preview-only or visual asset tweaks when they do not affect runtime behavior
+
+Codex should not change:
+
+- business logic, feature behavior, user flows, routing behavior, or navigation destinations
+- models, stores, reducers, controllers, services, clients, repositories, dependency containers, or calculations
+- networking, persistence, authentication, authorization, payments, subscriptions, analytics, telemetry, permissions, entitlements, signing, dependencies, bundle identifiers, or deployment targets
 
 ## Installation
 
 Choose one installation style.
 
-### Repository-local install
+### Copy Into One App
 
-Use this when one app repository should carry the skill with it:
+Use this when one SwiftUI macOS app repository should carry the skill with it:
 
 ```bash
 SKILL_REPO="/path/to/swiftui-glass-ui-codex-skill"
@@ -43,6 +50,8 @@ mkdir -p "$TARGET_REPO/.agents/skills"
 cp -R "$SKILL_REPO/.agents/skills/swiftui-glass-ui-designer" "$TARGET_REPO/.agents/skills/"
 test -f "$TARGET_REPO/.agents/skills/swiftui-glass-ui-designer/SKILL.md"
 ```
+
+After copying, open the target app repository in Codex and invoke the skill from that repo root.
 
 ### Global install
 
@@ -61,13 +70,17 @@ Restart Codex if the skill is not discovered immediately.
 
 ## Invocation
 
-Invoke the skill explicitly from inside a SwiftUI macOS app repository:
+Invoke the skill explicitly from inside an existing SwiftUI macOS app repository:
 
 ```text
 Use $swiftui-glass-ui-designer to upgrade this SwiftUI macOS app with a premium native glass-style interface. Inspect the project first, create a reusable design system, apply it consistently, preserve all business logic, build the app, and summarize changed files.
 ```
 
 More examples are in [examples/invocation.md](examples/invocation.md).
+
+## Expected Result
+
+A good run should produce a small, reusable SwiftUI visual system and apply it to the main app surfaces. It should not rewrite the product. Expect Codex to favor a few strong decisions: one calm background treatment, consistent material strengths, shared corner radii, readable strokes, subtle shadows, capsule selected states, and solid fallbacks when Reduce Transparency is enabled.
 
 ## Included Files
 
@@ -99,13 +112,13 @@ Run it from a target app repository to list likely SwiftUI view files before a r
 
 Keep the repository small. Put core operating instructions in `SKILL.md`, detailed guidance in `references/`, and deterministic helpers in `scripts/`.
 
-Before publishing or opening a PR, run:
+Before publishing or opening a PR, run the dependency-free validator:
 
 ```bash
 python3 scripts/validate_repo.py
 ```
 
-The validator checks required files, skill metadata, helper-script syntax, eval CSV shape, example references, and generated-artifact hygiene.
+The validator checks required files, skill metadata, README safety/install coverage, helper-script syntax, eval CSV shape, example references, and generated-artifact hygiene.
 
 Also review [evals/skill-prompts.csv](evals/skill-prompts.csv) when changing trigger scope. It should include positive prompts for SwiftUI macOS glass redesigns and negative prompts for backend, payments, auth, database, web, and unrelated Swift work.
 

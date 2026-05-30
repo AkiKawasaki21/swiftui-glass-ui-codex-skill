@@ -5,7 +5,7 @@ Use these prompts inside a SwiftUI macOS app repository after installing the ski
 ## Full redesign pass
 
 ```text
-Use $swiftui-glass-ui-designer to upgrade this SwiftUI macOS app with a premium native glass-style interface. Inspect the project first, create a reusable design system, apply it consistently, preserve all business logic, build the app, and summarize changed files.
+Use $swiftui-glass-ui-designer to upgrade this SwiftUI macOS app with a premium native glass-style interface. Inspect the project first, create a reusable design system, apply it consistently, preserve all business logic, do not change models/networking/persistence/auth/payments/subscriptions, build the app, and summarize changed files.
 ```
 
 ## Conservative polish pass
@@ -35,5 +35,5 @@ Use $swiftui-glass-ui-designer to refactor existing scattered glass styling into
 ## Menu-bar app polish
 
 ```text
-Use $swiftui-glass-ui-designer to polish this SwiftUI macOS menu-bar app interface. Focus on the popover, settings screen, onboarding, cards, buttons, hover states, and visual consistency. Preserve all feature behavior and do not edit services, stores, networking, persistence, or payments.
+Use $swiftui-glass-ui-designer to polish this SwiftUI macOS menu-bar app interface. Focus on the popover, settings screen, onboarding, cards, buttons, hover states, and visual consistency. Preserve all feature behavior and do not edit models, services, stores, networking, persistence, authentication, payments, subscriptions, or analytics.
 ```

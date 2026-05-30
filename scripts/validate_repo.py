@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import csv
 import re
-import sys
 from pathlib import Path
 
 
@@ -92,13 +91,14 @@ def check_skill_md(errors: list[str]) -> None:
         errors.append("SKILL.md name must use lowercase letters, digits, and hyphens only.")
 
     description = frontmatter.get("description", "")
-    for term in ("SwiftUI", "macOS", "business logic", "Do not use"):
+    for term in ("SwiftUI", "macOS", "business logic", "models", "networking", "persistence", "subscriptions", "Do not use"):
         if term not in description:
             errors.append(f"SKILL.md description should mention {term!r}.")
 
     body = text.lower()
     for phrase in (
         "never change business logic",
+        "do not add `.blur`",
         "references/implementation_checklist.md",
         "references/accessibility_rules.md",
         "scripts/find_swiftui_views.py",
@@ -120,6 +120,31 @@ def check_openai_yaml(errors: list[str]) -> None:
     for phrase in ("display_name:", "short_description:", "default_prompt:", SKILL_NAME):
         if phrase not in text:
             errors.append(f"openai.yaml should include {phrase!r}.")
+
+
+def check_readme(errors: list[str]) -> None:
+    path = ROOT / "README.md"
+    if not path.is_file():
+        return
+
+    text = read_text(path)
+    for phrase in (
+        "Who This Is For",
+        "What Codex Should Change",
+        "Copy Into One App",
+        "$TARGET_REPO/.agents/skills",
+        "$swiftui-glass-ui-designer",
+        "business logic",
+        "models",
+        "networking",
+        "persistence",
+        "authentication",
+        "payments",
+        "subscriptions",
+        "python3 scripts/validate_repo.py",
+    ):
+        if phrase not in text:
+            errors.append(f"README.md should include {phrase!r}.")
 
 
 def check_eval_csv(errors: list[str]) -> None:
@@ -187,6 +212,8 @@ def check_helper_script(errors: list[str]) -> None:
 
 def check_generated_artifacts(errors: list[str]) -> None:
     for path in ROOT.rglob("*"):
+        if ".git" in path.parts:
+            continue
         if "__pycache__" in path.parts:
             errors.append(f"Generated cache directory should not be committed: {path.relative_to(ROOT)}")
         if path.suffix in {".pyc", ".pyo"}:
@@ -199,6 +226,7 @@ def main() -> int:
     check_required_files(errors)
     check_skill_md(errors)
     check_openai_yaml(errors)
+    check_readme(errors)
     check_eval_csv(errors)
     check_examples(errors)
     check_helper_script(errors)

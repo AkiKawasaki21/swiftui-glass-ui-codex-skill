@@ -1,6 +1,6 @@
 ---
 name: swiftui-glass-ui-designer
-description: Upgrade an existing SwiftUI macOS app to a polished native glass-style interface without changing product behavior. Use for SwiftUI macOS Liquid Glass-style redesigns, translucent panels, glass cards, glass buttons, floating control-center layouts, visual polish, accessibility-safe materials, and reusable UI design-system work. Do not use for backend, business logic, API, database, authentication, payments, persistence, analytics, or non-SwiftUI projects.
+description: Upgrade an existing SwiftUI macOS app to a polished native glass-style interface without changing product behavior. Use for SwiftUI macOS Liquid Glass-style redesigns, translucent panels, glass cards, glass buttons, floating control-center layouts, visual polish, accessibility-safe materials, and reusable UI design-system work. Do not use for backend, business logic, models, API, database, networking, persistence, authentication, payments, subscriptions, analytics, or non-SwiftUI projects.
 ---
 
 # SwiftUI Glass UI Designer
@@ -9,7 +9,7 @@ Improve the visual interface of an existing SwiftUI macOS app. Create a polished
 
 This skill is for presentation-layer SwiftUI work: UI architecture, visual polish, reusable view components, accessibility, and macOS-native presentation.
 
-It is not for business logic, backend work, networking, authentication, payments, persistence, analytics, database logic, state-management behavior, or feature behavior changes.
+It is not for business logic, backend work, models, networking, persistence, authentication, payments, subscriptions, analytics, database logic, state-management behavior, or feature behavior changes.
 
 ## Core outcome
 
@@ -18,6 +18,17 @@ Transform the existing app into a refined macOS-native glass interface that feel
 The result should feel like a modern floating macOS control center: soft translucent surfaces, subtle depth, generous spacing, capsule controls, smooth states, and strong hierarchy.
 
 Do not make the app merely transparent. Build a reusable design system and apply it consistently.
+
+Use this opinionated recipe:
+
+1. Start with the app's existing information architecture.
+2. Add one calm ambient window background, not a different backdrop per screen.
+3. Use glass for structure: app shell, navigation selection, panels, cards, controls, and overlays.
+4. Use at most two or three material strengths in the first pass.
+5. Pair every translucent surface with readable foregrounds, subtle strokes, and Reduce Transparency fallbacks.
+6. Prefer fewer stronger decisions over many decorative effects.
+
+Do not add `.blur`, `.ultraThinMaterial`, gradients, shadows, or rounded rectangles everywhere. If a surface does not group content, indicate selection, or communicate hierarchy, leave it simpler.
 
 ## Safety contract
 
@@ -69,12 +80,13 @@ Useful discovery commands:
 ```bash
 rg --files -g '*.swift'
 rg '@main|WindowGroup|Settings|NavigationSplitView|NavigationStack|struct .+: View|var body: some View' -g '*.swift'
+rg 'URLSession|SwiftData|CoreData|@Query|StoreKit|RevenueCat|Keychain|Auth|Subscription|Payment|Analytics' -g '*.swift'
 python3 .agents/skills/swiftui-glass-ui-designer/scripts/find_swiftui_views.py
 ```
 
-Use the helper script only if the skill is installed in the target repo. If it is unavailable, use `rg` directly.
+Use the third command to identify files that are likely off-limits for a visual pass. Use the helper script only if the skill is installed in the target repo. If it is unavailable, use `rg` directly.
 
-Then make a short implementation plan that names the UI files you expect to touch and any files that are off-limits. Proceed with implementation unless the user asked only for analysis.
+Then make a short implementation plan that names the UI files you expect to touch and any files that are off-limits. Keep the first pass focused on the shell, navigation, primary screens, and reusable components. Proceed with implementation unless the user asked only for analysis.
 
 ## Design-system-first implementation
 
@@ -106,6 +118,8 @@ Avoid one-off styling scattered across many screens. If you repeat a material, r
 
 Do not introduce a large framework or dependency for visual styling. Prefer small SwiftUI components and modifiers that fit the existing project.
 
+For a first pass, keep the design system compact: tokens plus the components the edited screens actually use. Do not create unused abstractions just because they sound plausible.
+
 ## Visual direction
 
 Use a premium macOS glass aesthetic:
@@ -127,6 +141,7 @@ Use a premium macOS glass aesthetic:
 Avoid:
 
 - making everything transparent
+- adding blur to every container
 - excessive blur
 - low-contrast text
 - neon gradients
@@ -242,7 +257,7 @@ Run the most appropriate available build command. Prefer the project's documente
 - `xcodebuild -list` first for Xcode projects or workspaces, then build the relevant scheme.
 - Existing test, lint, or formatting commands when they are clearly part of the project and not expensive.
 
-After building, review changed files. In Git repositories, use `git diff --stat` and inspect the actual diff. Confirm that changes are limited to UI/presentation concerns. Watch for accidental edits involving `URLSession`, persistence, authentication, payments, analytics, reducers, stores, model calculations, or navigation behavior.
+After building, review changed files. In Git repositories, use `git diff --stat` and inspect the actual diff. Confirm that changes are limited to UI/presentation concerns. Watch for accidental edits involving `URLSession`, persistence, authentication, payments, subscriptions, analytics, reducers, stores, model calculations, or navigation behavior.
 
 If the build cannot be run because the environment lacks Xcode, a scheme, signing, or dependencies, report the exact blocker and still perform a source-level safety review.
 

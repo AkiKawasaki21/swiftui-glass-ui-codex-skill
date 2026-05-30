@@ -8,6 +8,8 @@ A glass interface should organize the app into clear layers: background, shell, 
 
 Do not add blur randomly to existing rectangles. Create a hierarchy where the glass effect helps users understand what is foreground, what is grouped, and what is interactive.
 
+Default to one ambient background, a small set of material strengths, shared radii, and clear selected states. If a surface does not group content or signal interaction, it may not need glass at all.
+
 ## Principle 2: Readability beats transparency
 
 The interface must remain readable in light mode, dark mode, and high-contrast situations. Increase material solidity, foreground opacity, or background quietness whenever text feels weak.
@@ -50,7 +52,7 @@ Preserve existing:
 - bindings and state ownership
 - async tasks and side effects
 - validation, sorting, filtering, and calculations
-- persistence, networking, authentication, payments, analytics, and permissions
+- persistence, networking, authentication, payments, subscriptions, analytics, and permissions
 
 When behavior and UI are intertwined, make the smallest visual change that keeps the existing logic intact.
 
