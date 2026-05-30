@@ -1,0 +1,127 @@
+# SwiftUI Glass UI Designer Skill
+
+A focused Codex Skill for upgrading existing SwiftUI macOS apps with a polished, native, glass-style interface.
+
+The skill helps Codex inspect an app, create or extend a small reusable design system, apply translucent panels/cards/buttons/navigation consistently, support accessibility fallbacks, build the project, and report exactly what changed.
+
+## What This Is
+
+This repository publishes one Codex Skill:
+
+```text
+.agents/skills/swiftui-glass-ui-designer/SKILL.md
+```
+
+It is an instruction bundle, not a Swift package or drop-in UI library. Codex adapts the guidance to the target app's structure.
+
+## Safety Promise
+
+The skill is intentionally UI-only. It tells Codex to preserve business logic and avoid changes to models, stores, services, networking, persistence, authentication, payments, analytics, routing behavior, feature calculations, entitlements, signing, dependencies, and deployment targets.
+
+Use it for SwiftUI macOS visual work such as:
+
+- reusable glass panels, cards, buttons, navigation items, sheets, and modifiers
+- dashboard, settings, onboarding, menu-bar popover, or app-shell polish
+- light mode, dark mode, Reduce Transparency, contrast, hover, focus, and selected-state improvements
+- refactoring duplicated visual styling into a smaller design system
+
+Do not use it for backend work, payment flows, authentication, database logic, feature behavior, generic web design, or non-SwiftUI projects.
+
+## Installation
+
+Choose one installation style.
+
+### Repository-local install
+
+Use this when one app repository should carry the skill with it:
+
+```bash
+SKILL_REPO="/path/to/swiftui-glass-ui-codex-skill"
+TARGET_REPO="/path/to/your/swiftui-macos-app"
+
+mkdir -p "$TARGET_REPO/.agents/skills"
+cp -R "$SKILL_REPO/.agents/skills/swiftui-glass-ui-designer" "$TARGET_REPO/.agents/skills/"
+test -f "$TARGET_REPO/.agents/skills/swiftui-glass-ui-designer/SKILL.md"
+```
+
+### Global install
+
+Use this when you want the skill available across repositories in your Codex setup:
+
+```bash
+SKILL_REPO="/path/to/swiftui-glass-ui-codex-skill"
+SKILL_HOME="${CODEX_HOME:-$HOME/.codex}/skills"
+
+mkdir -p "$SKILL_HOME"
+cp -R "$SKILL_REPO/.agents/skills/swiftui-glass-ui-designer" "$SKILL_HOME/"
+test -f "$SKILL_HOME/swiftui-glass-ui-designer/SKILL.md"
+```
+
+Restart Codex if the skill is not discovered immediately.
+
+## Invocation
+
+Invoke the skill explicitly from inside a SwiftUI macOS app repository:
+
+```text
+Use $swiftui-glass-ui-designer to upgrade this SwiftUI macOS app with a premium native glass-style interface. Inspect the project first, create a reusable design system, apply it consistently, preserve all business logic, build the app, and summarize changed files.
+```
+
+More examples are in [examples/invocation.md](examples/invocation.md).
+
+## Included Files
+
+```text
+.agents/skills/swiftui-glass-ui-designer/
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+├── references/
+│   ├── ACCESSIBILITY_RULES.md
+│   ├── DESIGN_PRINCIPLES.md
+│   ├── EXAMPLE_PROMPTS.md
+│   ├── IMPLEMENTATION_CHECKLIST.md
+│   ├── REVIEW_RUBRIC.md
+│   └── SWIFTUI_COMPONENT_PATTERNS.md
+└── scripts/
+    └── find_swiftui_views.py
+```
+
+The helper script is optional and read-only:
+
+```bash
+python3 .agents/skills/swiftui-glass-ui-designer/scripts/find_swiftui_views.py
+```
+
+Run it from a target app repository to list likely SwiftUI view files before a redesign pass.
+
+## Developer Workflow
+
+Keep the repository small. Put core operating instructions in `SKILL.md`, detailed guidance in `references/`, and deterministic helpers in `scripts/`.
+
+Before publishing or opening a PR, run:
+
+```bash
+python3 scripts/validate_repo.py
+```
+
+The validator checks required files, skill metadata, helper-script syntax, eval CSV shape, example references, and generated-artifact hygiene.
+
+Also review [evals/skill-prompts.csv](evals/skill-prompts.csv) when changing trigger scope. It should include positive prompts for SwiftUI macOS glass redesigns and negative prompts for backend, payments, auth, database, web, and unrelated Swift work.
+
+## Quality Expectations
+
+A successful skill run should:
+
+- inspect before editing
+- create reusable SwiftUI presentation components or modifiers
+- avoid changing business logic
+- preserve existing app behavior and navigation
+- improve visual consistency
+- support light mode, dark mode, and Reduce Transparency
+- build the app or report the exact environmental blocker
+- list changed files and verification steps
+
+## License
+
+MIT License. See [LICENSE](LICENSE).

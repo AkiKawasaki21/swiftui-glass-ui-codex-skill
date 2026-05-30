@@ -1,0 +1,10 @@
+.DS_Store
+*.swp
+*.tmp
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.build/
+DerivedData/
+.swiftpm/
+.env

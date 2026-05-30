@@ -1,0 +1,13 @@
+id,should_trigger,prompt
+explicit-01,true,"Use $swiftui-glass-ui-designer to upgrade this SwiftUI macOS app with a glass-style interface."
+implicit-01,true,"Make this SwiftUI macOS app feel like a premium native glass UI with translucent cards and capsule buttons."
+implicit-02,true,"Refactor my macOS SwiftUI app styling into reusable glass panels, glass cards, and glass buttons."
+implicit-03,true,"Polish the settings screen and onboarding of this SwiftUI macOS app so the glass design is consistent and accessible."
+implicit-04,true,"Audit this SwiftUI macOS app for duplicated glass styling, weak contrast, and missing Reduce Transparency support."
+negative-01,false,"Fix the authentication flow in my SwiftUI app."
+negative-02,false,"Add Stripe subscriptions to my macOS app."
+negative-03,false,"Create a React glassmorphism landing page."
+negative-04,false,"Debug my database sync issue."
+negative-05,false,"Write a Swift package for networking."
+negative-06,false,"Change the sorting logic in my SwiftUI app's data model."
+negative-07,false,"Raise my macOS deployment target and update signing entitlements."
