@@ -192,6 +192,7 @@ def check_github_workflow(errors: list[str]) -> None:
         "permissions:",
         "contents: read",
         "concurrency:",
+        "PYTHONDONTWRITEBYTECODE",
         "timeout-minutes:",
         "python3 -m py_compile scripts/validate_repo.py",
         "python3 scripts/validate_repo.py",

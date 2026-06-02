@@ -12,6 +12,9 @@ concurrency:
   group: validate-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+
 jobs:
   validate:
     runs-on: ubuntu-latest
