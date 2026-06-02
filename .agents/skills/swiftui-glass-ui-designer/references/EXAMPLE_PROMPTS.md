@@ -37,3 +37,9 @@ Use $swiftui-glass-ui-designer to refactor existing scattered glass styling into
 ```text
 Use $swiftui-glass-ui-designer to polish this SwiftUI macOS menu-bar app interface. Focus on the popover, settings screen, onboarding, cards, buttons, hover states, and visual consistency. Preserve all feature behavior and do not edit models, services, stores, networking, persistence, authentication, payments, subscriptions, or analytics.
 ```
+
+## Release smoke test
+
+```text
+Use $swiftui-glass-ui-designer for a release smoke test in this SwiftUI macOS app. Audit only, do not edit files, identify visual-system opportunities, name off-limits business logic files, and report the build command a real implementation should run.
+```

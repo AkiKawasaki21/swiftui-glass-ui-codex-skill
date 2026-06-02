@@ -19,7 +19,11 @@ REQUIRED_FILES = [
     ROOT / "CONTRIBUTING.md",
     ROOT / "SECURITY.md",
     ROOT / "CHANGELOG.md",
+    ROOT / "RELEASE.md",
     ROOT / "VERSION",
+    ROOT / ".gitignore",
+    ROOT / ".github" / "pull_request_template.md",
+    ROOT / ".github" / "workflows" / "validate.yml",
     ROOT / "examples" / "invocation.md",
     ROOT / "evals" / "skill-prompts.csv",
     SKILL_MD,
@@ -141,10 +145,76 @@ def check_readme(errors: list[str]) -> None:
         "authentication",
         "payments",
         "subscriptions",
+        "RELEASE.md",
         "python3 scripts/validate_repo.py",
     ):
         if phrase not in text:
             errors.append(f"README.md should include {phrase!r}.")
+
+
+def check_release_metadata(errors: list[str]) -> None:
+    version_path = ROOT / "VERSION"
+    changelog_path = ROOT / "CHANGELOG.md"
+    release_path = ROOT / "RELEASE.md"
+
+    if not version_path.is_file():
+        return
+
+    version = read_text(version_path).strip()
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        errors.append("VERSION must use semantic version format like 0.1.0.")
+
+    if changelog_path.is_file():
+        changelog = read_text(changelog_path)
+        if f"## {version}" not in changelog:
+            errors.append(f"CHANGELOG.md must include an entry for VERSION {version}.")
+
+    if release_path.is_file():
+        release = read_text(release_path)
+        for phrase in (
+            "python3 scripts/validate_repo.py",
+            "git tag v",
+            "GitHub release",
+            "CHANGELOG.md",
+            "Codex Skill instruction bundle",
+        ):
+            if phrase not in release:
+                errors.append(f"RELEASE.md should include {phrase!r}.")
+
+
+def check_github_workflow(errors: list[str]) -> None:
+    workflow_path = ROOT / ".github" / "workflows" / "validate.yml"
+    if not workflow_path.is_file():
+        return
+
+    text = read_text(workflow_path)
+    for phrase in (
+        "permissions:",
+        "contents: read",
+        "concurrency:",
+        "timeout-minutes:",
+        "python3 -m py_compile scripts/validate_repo.py",
+        "python3 scripts/validate_repo.py",
+    ):
+        if phrase not in text:
+            errors.append(f".github/workflows/validate.yml should include {phrase!r}.")
+
+
+def check_pull_request_template(errors: list[str]) -> None:
+    path = ROOT / ".github" / "pull_request_template.md"
+    if not path.is_file():
+        return
+
+    text = read_text(path)
+    for phrase in (
+        "Skill Scope",
+        "UI-only safety contract",
+        "business logic",
+        "python3 scripts/validate_repo.py",
+        "evals/skill-prompts.csv",
+    ):
+        if phrase not in text:
+            errors.append(f".github/pull_request_template.md should include {phrase!r}.")
 
 
 def check_eval_csv(errors: list[str]) -> None:
@@ -163,6 +233,8 @@ def check_eval_csv(errors: list[str]) -> None:
 
     seen_ids: set[str] = set()
     trigger_values: set[str] = set()
+    positive_count = 0
+    negative_count = 0
     for row in rows:
         row_id = row.get("id", "")
         if not row_id:
@@ -175,12 +247,20 @@ def check_eval_csv(errors: list[str]) -> None:
         if should_trigger not in {"true", "false"}:
             errors.append(f"Eval {row_id} has invalid should_trigger value: {should_trigger!r}")
         trigger_values.add(should_trigger)
+        if should_trigger == "true":
+            positive_count += 1
+        if should_trigger == "false":
+            negative_count += 1
 
         if not row.get("prompt"):
             errors.append(f"Eval {row_id} is missing a prompt.")
 
     if trigger_values != {"true", "false"}:
         errors.append("Eval CSV must include both triggering and non-triggering prompts.")
+    if positive_count < 5:
+        errors.append("Eval CSV should include at least five triggering prompts.")
+    if negative_count < 8:
+        errors.append("Eval CSV should include at least eight non-triggering prompts.")
 
 
 def check_examples(errors: list[str]) -> None:
@@ -197,6 +277,13 @@ def check_examples(errors: list[str]) -> None:
             errors.append(f"{path.relative_to(ROOT)} should include an explicit skill invocation.")
         if "business logic" not in text:
             errors.append(f"{path.relative_to(ROOT)} should mention preserving business logic.")
+
+    invocation = ROOT / "examples" / "invocation.md"
+    reference_examples = SKILL_DIR / "references" / "EXAMPLE_PROMPTS.md"
+    if invocation.is_file() and "Release smoke test" not in read_text(invocation):
+        errors.append("examples/invocation.md should include a release smoke test prompt.")
+    if reference_examples.is_file() and "Release smoke test" not in read_text(reference_examples):
+        errors.append("references/EXAMPLE_PROMPTS.md should include a release smoke test prompt.")
 
 
 def check_helper_script(errors: list[str]) -> None:
@@ -220,6 +307,17 @@ def check_generated_artifacts(errors: list[str]) -> None:
             errors.append(f"Generated Python bytecode should not be committed: {path.relative_to(ROOT)}")
 
 
+def check_gitignore(errors: list[str]) -> None:
+    path = ROOT / ".gitignore"
+    if not path.is_file():
+        return
+
+    text = read_text(path)
+    for phrase in (".DS_Store", "__pycache__/", "*.py[cod]", ".pytest_cache/", ".build/", "DerivedData/"):
+        if phrase not in text:
+            errors.append(f".gitignore should include {phrase!r}.")
+
+
 def main() -> int:
     errors: list[str] = []
 
@@ -227,10 +325,14 @@ def main() -> int:
     check_skill_md(errors)
     check_openai_yaml(errors)
     check_readme(errors)
+    check_release_metadata(errors)
+    check_github_workflow(errors)
+    check_pull_request_template(errors)
     check_eval_csv(errors)
     check_examples(errors)
     check_helper_script(errors)
     check_generated_artifacts(errors)
+    check_gitignore(errors)
 
     if errors:
         print("Validation failed:")

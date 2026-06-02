@@ -5,13 +5,25 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+      - name: Compile Python helpers
+        run: |
+          python3 -m py_compile scripts/validate_repo.py
+          python3 -m py_compile .agents/skills/swiftui-glass-ui-designer/scripts/find_swiftui_views.py
       - name: Validate repository
         run: python3 scripts/validate_repo.py

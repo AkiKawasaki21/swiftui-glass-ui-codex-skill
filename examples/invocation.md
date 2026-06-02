@@ -43,3 +43,9 @@ Use $swiftui-glass-ui-designer to refactor scattered glass styling into reusable
 ```text
 Use $swiftui-glass-ui-designer to audit the current UI implementation. Do not edit yet. Identify likely UI files, files that should remain off-limits, duplicated glass styling, weak contrast, screens needing polish, accessibility gaps, and design-system files that should be created.
 ```
+
+## Release smoke test
+
+```text
+Use $swiftui-glass-ui-designer for a release smoke test in this SwiftUI macOS app. Audit only, do not edit files, confirm whether the app has clear UI targets for a conservative glass pass, name off-limits business logic files, and report the build command you would use after a real implementation.
+```

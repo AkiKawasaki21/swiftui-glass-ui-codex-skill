@@ -122,6 +122,8 @@ The validator checks required files, skill metadata, README safety/install cover
 
 Also review [evals/skill-prompts.csv](evals/skill-prompts.csv) when changing trigger scope. It should include positive prompts for SwiftUI macOS glass redesigns and negative prompts for backend, payments, auth, database, web, and unrelated Swift work.
 
+Use [RELEASE.md](RELEASE.md) before tagging a release. It covers version and changelog updates, local validation, GitHub release notes, and post-release smoke checks.
+
 ## Quality Expectations
 
 A successful skill run should:

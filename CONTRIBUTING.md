@@ -33,5 +33,6 @@ Before opening a PR:
 - [ ] Example prompts still work with the skill name.
 - [ ] `evals/skill-prompts.csv` covers new trigger behavior.
 - [ ] `python3 scripts/validate_repo.py` passes.
+- [ ] `VERSION`, `CHANGELOG.md`, and `RELEASE.md` are updated for release-oriented changes.
 
 Keep the repo focused. Prefer updating `SKILL.md` or an existing reference file before adding new files.
