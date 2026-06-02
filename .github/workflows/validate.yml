@@ -26,7 +26,11 @@ jobs:
           python-version: "3.x"
       - name: Compile Python helpers
         run: |
-          python3 -m py_compile scripts/validate_repo.py
-          python3 -m py_compile .agents/skills/swiftui-glass-ui-designer/scripts/find_swiftui_views.py
+          python3 -B -m py_compile scripts/validate_repo.py
+          python3 -B -m py_compile .agents/skills/swiftui-glass-ui-designer/scripts/find_swiftui_views.py
+      - name: Remove generated Python cache files
+        run: |
+          find . -type d -name "__pycache__" -prune -exec rm -rf {} +
+          find . -name "*.pyc" -delete
       - name: Validate repository
         run: python3 scripts/validate_repo.py

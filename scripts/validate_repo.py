@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import csv
 import re
+import subprocess
 from pathlib import Path
 
 
@@ -194,7 +195,9 @@ def check_github_workflow(errors: list[str]) -> None:
         "concurrency:",
         "PYTHONDONTWRITEBYTECODE",
         "timeout-minutes:",
-        "python3 -m py_compile scripts/validate_repo.py",
+        "python3 -B -m py_compile scripts/validate_repo.py",
+        'find . -type d -name "__pycache__" -prune -exec rm -rf {} +',
+        'find . -name "*.pyc" -delete',
         "python3 scripts/validate_repo.py",
     ):
         if phrase not in text:
@@ -298,14 +301,45 @@ def check_helper_script(errors: list[str]) -> None:
         errors.append(f"Helper script syntax error: {exc}")
 
 
+def tracked_files(errors: list[str]) -> list[Path]:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "ls-files", "-z"],
+            check=True,
+            capture_output=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        errors.append(f"Unable to list tracked files with git ls-files: {exc}")
+        return []
+
+    return [ROOT / item.decode("utf-8") for item in result.stdout.split(b"\0") if item]
+
+
 def check_generated_artifacts(errors: list[str]) -> None:
-    for path in ROOT.rglob("*"):
-        if ".git" in path.parts:
-            continue
+    for path in tracked_files(errors):
+        rel = path.relative_to(ROOT)
         if "__pycache__" in path.parts:
-            errors.append(f"Generated cache directory should not be committed: {path.relative_to(ROOT)}")
+            errors.append(f"Generated cache directory should not be committed: {rel}")
         if path.suffix in {".pyc", ".pyo"}:
-            errors.append(f"Generated Python bytecode should not be committed: {path.relative_to(ROOT)}")
+            errors.append(f"Generated Python bytecode should not be committed: {rel}")
+        if path.name == ".DS_Store":
+            errors.append(f"macOS metadata file should not be committed: {rel}")
+        if ".pytest_cache" in path.parts:
+            errors.append(f"Pytest cache should not be committed: {rel}")
+        if ".build" in path.parts:
+            errors.append(f"Swift build output should not be committed: {rel}")
+        if "DerivedData" in path.parts:
+            errors.append(f"Xcode derived data should not be committed: {rel}")
+        if ".swiftpm" in path.parts:
+            errors.append(f"SwiftPM workspace metadata should not be committed: {rel}")
+        if path.name.endswith(".xcuserstate"):
+            errors.append(f"Xcode user state should not be committed: {rel}")
+        if path.suffix == ".swp":
+            errors.append(f"Editor swap file should not be committed: {rel}")
+        if path.suffix == ".tmp":
+            errors.append(f"Temporary file should not be committed: {rel}")
+        if path.name == ".env":
+            errors.append(f"Environment file should not be committed: {rel}")
 
 
 def check_gitignore(errors: list[str]) -> None:
@@ -314,7 +348,7 @@ def check_gitignore(errors: list[str]) -> None:
         return
 
     text = read_text(path)
-    for phrase in (".DS_Store", "__pycache__/", "*.py[cod]", ".pytest_cache/", ".build/", "DerivedData/"):
+    for phrase in (".DS_Store", "__pycache__/", "*.py[cod]", ".pytest_cache/", ".build/", "DerivedData/", "*.xcuserstate"):
         if phrase not in text:
             errors.append(f".gitignore should include {phrase!r}.")
 
